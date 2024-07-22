@@ -1,0 +1,45 @@
+services:
+  db:
+    image: lscr.io/linuxserver/mariadb
+    container_name: bookstack-db
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Shanghai
+      - MYSQL_ROOT_PASSWORD=xiangwen123
+      - MYSQL_DATABASE=bookstackapp
+      - MYSQL_USER=bookstack
+      - MYSQL_PASSWORD=xiangwen123
+    volumes:
+      - ./bookstack/db/data:/config
+    restart: always
+    networks:
+      - bookstack-net
+
+  bookstack:
+    image: lscr.io/linuxserver/bookstack
+    container_name: bookstack
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Shanghai
+      - APP_URL=http://xw.bookstack.h5xiaomi.com
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=bookstack
+      - DB_PASS=xiangwen123
+      - DB_DATABASE=bookstackapp
+    volumes:
+      - ./bookstack/app/data:/config
+    ports:
+      - 80:80
+      - 443:443
+    restart: always
+    depends_on:
+      - db
+    networks:
+      - bookstack-net
+
+networks:
+  bookstack-net:
+    driver: bridge
